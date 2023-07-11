@@ -3,12 +3,30 @@ library(lubridate)
 library(quantmod)
 library(rio)
 
-#Get MSCI ACWI ex US Index
-acwi_exUS <- import("./Index returns data/acwi_exUS_price_net.xls", skip = 6)
+#Update these values
 
+#Get MSCI ACWI ex US Index
+FolderName <- "Index returns data"
+InputFileName <- "acwi_exUS_price_net.xls"
+OutputFileName <- "index_returns.csv"
+AssetPriceName <- "ACWI ex USA Standard (Large+Mid Cap)"
+symbols <- c("IWV", "VBTIX")
+
+#Calculate the range for slicing
+#This range will
+MinYear <- 1987
+MaxYear <- 2023
+Range <- (MaxYear - MinYear)*12 + 1
+
+#Range for calculating yearly price data
+PriceStartDate <- "1998-12-31"
+PriceEndDate <- "2023-01-01"
+###############################################################
+
+acwi_exUS <- import(paste(FolderName, "/", InputFileName,sep = ""), skip = 6)
 acwi_exUS_price <- acwi_exUS %>%  
-  slice(1:253) %>% # last few rows are not numbers
-  rename(acwi_exUS = `ACWI ex USA Standard (Large+Mid Cap)`,
+  slice(1:Range) %>% # last few rows are not numbers
+  rename(acwi_exUS = AssetPriceName,
          date = Date) %>% 
   mutate(acwi_exUS = as.numeric(acwi_exUS),
          date = mdy(date),
@@ -17,12 +35,12 @@ acwi_exUS_price <- acwi_exUS %>%
   select(-date)
 
 #Get iShares Russell 3000 ETF (IWV) and Vanguard Total Bond Market Index Fund Institutional Shares (VBTIX) prices
-symbols <- c("IWV", "VBTIX")
+
 
 prices <- getSymbols(symbols,
                      src = "yahoo",
-                     from = "1998-12-31",
-                     to = "2022-01-01",
+                     from = PriceStartDate,
+                     to = PriceEndDate,
                      auto.assign = T,
                      warnings = F) %>% 
   map(~Ad(get(.))) %>% 
@@ -51,5 +69,5 @@ index_returns <- index_price %>%
   pivot_wider(names_from = index, values_from = index_returns) %>% 
   ungroup()
 
-export(index_returns, "./Index returns data/index_returns.csv")
-
+export(index_returns, paste(FolderName, "/", OutputFileName,sep = ""))
+#export(index_returns,OutputFileName)

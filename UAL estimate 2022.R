@@ -9,22 +9,33 @@ library(quantmod)
 library(quadprog)
 library(rio)
 
+#Update these values
+PPDLatest <- "ppd-data-latest.csv"
+IndexReturnsFile <- "index_returns.csv"
+FolderName <- "Index returns data"
+StatePopData <- "State population.xlsx"
+ReturnsDataFile <- "AnnualReturns.csv"
+#Specify fiscal years
+pre_fy <- 2021
+current_fy <- 2022
+latest_update_year <- 2023
+###############################################################
 #Import pension data
-ppd_full <- read.csv("ppd-data-latest-05-2022.csv") 
+ppd_full <- read.csv(PPDLatest)
+returns_data <- read.csv(ReturnsDataFile)
+returns_data$fy <- latest_update_year
 # reason_data <- read_excel("StateDataFiltered_2001-2021.xlsx")
 
 #Import index returns data
-index_returns <- read.csv("./Index returns data/index_returns.csv")
+index_returns <- read.csv(paste(FolderName, "/", IndexReturnsFile,sep = ""))
 
 #Import population data
-uspop <- import("State population.xlsx")
+uspop <- import(StatePopData)
 
-#Specify fiscal years
-pre_fy <- 2020
-current_fy <- 2021
+
 
 #Filter and clean PPD data
-ppd <- ppd_full %>% 
+ppd <- ppd_full %>%
   mutate(PlanFullName = gsub("\x92", "'", PlanFullName),    #clean plan names and full names
          PlanName = gsub("\x92", "'", PlanName)) %>% 
   filter(AdministeringGovt == 0, fy > 2000, !(PlanName %in% c("Colorado State and School", 
@@ -186,7 +197,7 @@ ppd_project <- ppd %>%
          payroll_growth = payroll_growth_f(payroll_growth, payroll_growth_avg),
          payroll = growth_f(x = payroll, g = payroll_growth),
          ben_pay = growth_f(x = ben_pay, g = ben_pay_growth_avg)
-         ) %>% 
+  ) %>% 
   ungroup()
 
 
@@ -225,8 +236,11 @@ ppd_benchmark <- ppd_project %>%
   group_by(plan_name) %>% 
   mutate(benchmark = benchmark_portfolio(return, acwi_exUS, IWV, VBTIX),
          benchmark_return = benchmark[[1]][2]*acwi_exUS + benchmark[[1]][3]*IWV + benchmark[[1]][4]*VBTIX,
-         predict_return = benchmark[[1]][1] + benchmark[[1]][2]*acwi_exUS + benchmark[[1]][3]*IWV + benchmark[[1]][4]*VBTIX) %>% 
-  ungroup()
+         predict_return = benchmark[[1]][1] + benchmark[[1]][2]*acwi_exUS + benchmark[[1]][3]*IWV + benchmark[[1]][4]*VBTIX) %>%
+  left_join(returns_data, by = c("plan_name","fy")) %>%
+  mutate(real_vs_estimate = ifelse(is.na(return),'input',real_vs_estimate),
+         return = ifelse(is.na(return), LatestReturn, return)) %>%
+ungroup()
 
 
 #Custom functions to project return, aal, and mva
@@ -266,8 +280,7 @@ mva_f <- function(mva, return, payroll, cont_rate, ben_pay) {
 #Final projection with 2022 return input
 return_2022 <- 0   #input the expected 2022 return here (currently default to 0%)
 
-ppd_project_final <- ppd_project %>% 
-  left_join(ppd_benchmark) %>% 
+ppd_project_final <- ppd_benchmark %>% 
   group_by(plan_name) %>% 
   mutate(return = return_f(return, predict_return, fy, proj_return = return_2022),
          aal = aal_f(aal, arr, payroll, nc, ben_pay),
@@ -347,5 +360,5 @@ ppd_project_state_capita <- ppd_project_state %>%
 # 
 
 
-  
+
 
