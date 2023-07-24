@@ -124,7 +124,7 @@ mva_f <- function(mva, return, payroll, cont_rate, ben_pay) {
 
 
 #Final projection function 
-projection_f <- function(input_return, inf_adj = F, output_type = "plan") {
+projection_f <- function(input_return, inf_adj = F) {
   
   #plan projection
   ppd_project_plan <- ppd_benchmark %>% 
@@ -139,33 +139,68 @@ projection_f <- function(input_return, inf_adj = F, output_type = "plan") {
     mutate(ual = aal - mva, 
            funded_ratio = mva/aal,
            .after = mva) %>% 
-    ungroup()
+    ungroup() %>% 
+    select(fy, plan_name, plan_full_name, state, ual_official, returns_official,
+           aal, mva, ual, funded_ratio) %>% 
+    mutate(type = "plan")
+  
+  #Threshold to determine if UAL and returns are "official". 
+  #If the threshold is 0.9, it means the state's (or national) numbers are considered "official" if more than 90% of its UAL (or returns), weighted by AAL, has been reported.
+  official_threshold = 0.9
   
   #state projection
   ppd_project_state <- ppd_project_plan %>% 
     group_by(state, fy) %>% 
-    summarise(state_aal = sum(aal, na.rm = T),
-              state_mva = sum(mva, na.rm = T)) %>% 
+    summarise(
+      ual_official = weighted.mean(x = ual_official, w = aal),
+      returns_official = weighted.mean(returns_official, w = aal),
+      aal = sum(aal, na.rm = T),
+      mva = sum(mva, na.rm = T)) %>% 
     ungroup() %>% 
-    mutate(state_ual = state_aal - state_mva,
-           state_funded_ratio = state_mva / state_aal)
+    mutate(ual = aal - mva,
+           funded_ratio = mva/aal,
+           ual_official = ifelse(ual_official > official_threshold, 1, 0),
+           returns_official = ifelse(returns_official > official_threshold, 1, 0),
+           type = "state")
   
   #national (us) projection
   ppd_project_us <- ppd_project_plan %>% 
     group_by(fy) %>% 
-    summarise(us_aal = sum(aal, na.rm = T),
-              us_mva = sum(mva, na.rm = T)) %>% 
+    summarise(
+      ual_official = weighted.mean(x = ual_official, w = aal),
+      returns_official = weighted.mean(returns_official, w = aal),
+      # ual_official = mean(ual_official),
+      # returns_official = mean(returns_official),
+      aal = sum(aal, na.rm = T),
+      mva = sum(mva, na.rm = T)) %>% 
     ungroup() %>% 
-    mutate(us_ual = us_aal - us_mva,
-           us_funded_ratio = us_mva / us_aal)
+    mutate(ual = aal - mva,
+           funded_ratio = mva/aal,
+           ual_official = ifelse(ual_official > official_threshold, 1, 0),
+           returns_official = ifelse(returns_official > official_threshold, 1, 0),
+           state = "USA",
+           type = "national")
   
-  if (output_type == "plan") {
-    return(ppd_project_plan)
-  } else if(output_type == "state") {
-    return(ppd_project_state)
-  } else if(output_type == "us") {
-    return(ppd_project_us)
-  }
+  
+  
+  #combined projections (plan, state, and national)
+  ppd_project_combined <- bind_rows(ppd_project_plan,
+                                    ppd_project_state,
+                                    ppd_project_us)
+  
+  
+  
+  return(ppd_project_combined)
+  
+  
+  
+  # if (output_type == "plan") {
+  #   return(ppd_project_plan)
+  # } else if(output_type == "state") {
+  #   return(ppd_project_state)
+  # } else if(output_type == "us") {
+  #   return(ppd_project_us)
+  # }
   
 }
 

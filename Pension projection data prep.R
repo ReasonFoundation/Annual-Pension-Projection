@@ -15,7 +15,7 @@ ppd <- ppd_full %>%
   mutate(PlanFullName = gsub("\x92", "'", PlanFullName),    #clean plan names and full names
          PlanName = gsub("\x92", "'", PlanName)) %>% 
   #Select state plans only and get data after 2000. Filter out three plans that don't have enough data.
-  filter(AdministeringGovt == 0, fy > 2000, !(PlanName %in% c("Colorado State and School", 
+  filter(AdministeringGovt == 0, fy > 2001, !(PlanName %in% c("Colorado State and School", 
                                                               "Oklahoma Municipal Employees",
                                                               "Missouri Local"))) %>%    
   select(fy, fye, PlanName, PlanFullName, StateName, ActLiabilities_GASB, MktAssets_net,
