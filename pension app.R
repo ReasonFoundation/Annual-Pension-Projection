@@ -34,8 +34,7 @@ funded_ratio_echart <- function(data) {
 #UAL charting function
 ual_echart <- function(data) {
   data %>% 
-    mutate(ual = ual / 1000,
-           ual_real = ifelse(ual_official == 1, ual, NA),
+    mutate(ual_real = ifelse(ual_official == 1, ual, NA),
            fy = as.character(fy)) %>% 
     e_chart(fy) %>%  
     e_line(ual, symbolSize = 7, lineStyle = list(width = 3, type = "dotted")) %>% 
@@ -66,16 +65,20 @@ pension_table <- function(data, type) {
   reactable(
     data = data,
     searchable = T,
+    filterable = T,
+    showSortable = T,
+    striped = T,
+    highlight = T,
     # minRows = 20,
     defaultPageSize = 22,
     columns = list(
       fy = colDef(name = "Fiscal Year"),
       plan_name = colDef(name = "Plan", show = ifelse(type == "plan", T, F)),
       state = colDef(name = "State"),
-      aal = colDef(name = "Accrued Liability"),
-      mva = colDef(name = "Market Assets"),
-      ual = colDef(name = "Unfunded Liability"),
-      funded_ratio = colDef(name = "Funded Ratio")
+      aal = colDef(name = "Accrued Liability", format = colFormat(prefix = "$", separators = T, suffix = "M", digits = 0)),
+      mva = colDef(name = "Market Assets", format = colFormat(prefix = "$", separators = T, suffix = "M", digits = 0)),
+      ual = colDef(name = "Unfunded Liability", format = colFormat(prefix = "$", separators = T, suffix = "M", digits = 0)),
+      funded_ratio = colDef(name = "Funded Ratio", format = colFormat(percent = T, digits = 0))
     )
   )
 }
@@ -155,7 +158,10 @@ server <- function(input, output, session) {
   })
   
   #Overall output
-  model_output <- reactive({projection_f(input_return = input$return_2023/100, inf_adj = input$inf_adj)})
+  model_output <- reactive({
+    projection_f(input_return = input$return_2023/100, inf_adj = input$inf_adj) %>% 
+      mutate(ual = ual/1000)
+    })
   
   #Output for the selected plan
   plan_output <- reactive({
