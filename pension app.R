@@ -28,6 +28,7 @@ funded_ratio_echart <- function(data) {
                 }
     ")) %>% 
     e_legend(F) %>% 
+    e_grid(left = "10%", bottom = "8%") %>% 
     e_title("Funded Ratio")
 }
 
@@ -57,6 +58,7 @@ ual_echart <- function(data) {
                                                     }
                                                     return(params.value[0] + ': ' + x)}")) %>% 
     e_legend(F) %>% 
+    e_grid(left = "12%", bottom = "8%") %>% 
     e_title("Unfunded Liability - based on MVA")  
 }
 
