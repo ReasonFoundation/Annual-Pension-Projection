@@ -18,7 +18,7 @@ ppd <- ppd_full %>%
   filter(AdministeringGovt == 0, fy > 2001, !(PlanName %in% c("Colorado State and School", 
                                                               "Oklahoma Municipal Employees",
                                                               "Missouri Local"))) %>%    
-  select(fy, fye, PlanName, PlanFullName, StateName, ActLiabilities_GASB, MktAssets_net,
+  select(fy, fye, PlanName, PlanFullName, StateName, ActLiabilities_GASB, MktAssets_net, TotalPensionLiability,
          InvestmentReturnAssumption_GASB, InvestmentReturn_1yr, payroll,
          PayrollGrowthAssumption, NormCostRate_tot, ReqContRate_tot, ReqContRate_tot_Stat, 
          expense_TotBenefits) %>% 
@@ -30,6 +30,7 @@ ppd <- ppd_full %>%
          state = StateName,             
          aal = ActLiabilities_GASB,
          mva = MktAssets_net,
+         tpl = TotalPensionLiability,
          arr = InvestmentReturnAssumption_GASB,
          return = InvestmentReturn_1yr,
          payroll_growth = PayrollGrowthAssumption,
@@ -87,9 +88,9 @@ ppd_project <- ppd %>%
 #Identify years that have missing AAL/MVA data or have duplicated AAL data
 #1 means the UAL number has been officially reported in the data set; 0 means the UAL number is estimated by the model
 ppd_project <- ppd_project %>% 
-  mutate(ual_official = case_when(is.na(aal) ~ 0,
+  mutate(ual_official = case_when(is.na(aal) & is.na(tpl) ~ 0,
                                   is.na(mva) ~ 0,
-                                  aal == lag(aal) ~ 0, 
+                                  aal == lag(aal) & is.na(tpl) ~ 0, 
                                   TRUE ~ 1), .before = aal) %>% 
   #Identify years that have missing returns
   #1 means the returns have been officially reported in the data set or in the "latest return" file; 0 means the returns are missing.

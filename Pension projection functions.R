@@ -103,10 +103,18 @@ return_f <- function(return, fy, latest_return, predict_return, input_return) {
 }
 
 #AAL function
-aal_f <- function(aal, arr, payroll, nc, ben_pay) {
+aal_f <- function(aal, tpl, arr, payroll, nc, ben_pay) {
   for(i in 2:length(aal)) {
+    #if aal is not available or the aal number is identical to the aal number in the previous year (indicating a data error)
     if(is.na(aal[i]) || isTRUE(aal[i] == aal[i-1])) {
-      aal[i] <- aal[i-1]*(1 + arr[i]) + (nc[i]*payroll[i] + ben_pay[i])*(1 + arr[i])^0.5
+      #but if total pension liability is available
+      if (!is.na(tpl[i])) {
+        #then use the total pension liability figure
+        aal[i] <- tpl[i]
+      } else {
+        #if tpl isn't avaolable, estimate the aal by the roll forward method
+        aal[i] <- aal[i-1]*(1 + arr[i]) + (nc[i]*payroll[i] + ben_pay[i])*(1 + arr[i])^0.5  
+      }
     }
   }
   return(aal)
@@ -132,7 +140,7 @@ projection_f <- function(input_return, inf_adj = F) {
     group_by(plan_name) %>% 
     mutate(return = return_f(return, fy, latest_return, predict_return, input_return),
            inf_adj = inf_adj,
-           aal = aal_f(aal, arr, payroll, nc, ben_pay),
+           aal = aal_f(aal, tpl, arr, payroll, nc, ben_pay),
            aal = ifelse(inf_adj == T, aal * cpi[fy == latest_update_year] / cpi, aal),
            mva = mva_f(mva, return, payroll, cont_rate, ben_pay),
            mva = ifelse(inf_adj == T, mva * cpi[fy == latest_update_year] / cpi, mva)) %>% 
