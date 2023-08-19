@@ -1,5 +1,7 @@
 rm(list = ls())
-library(tidyverse)
+# library(tidyverse)
+library(dplyr)
+library(tidyr)
 library(readxl)
 library(plotly)
 library(formattable)

@@ -11,9 +11,15 @@ index_returns <- read.csv(paste(FolderName, "/", index_returns_output, sep = "")
 # uspop <- import(StatePopData)
 
 #Filter and clean PPD data
-ppd <- ppd_full %>%
-  mutate(PlanFullName = gsub("\x92", "'", PlanFullName),    #clean plan names and full names
-         PlanName = gsub("\x92", "'", PlanName)) %>% 
+# ppd <- ppd_full %>%
+#   mutate(PlanFullName = gsub("\x92", "'", PlanFullName),    #clean plan names and full names
+#          PlanName = gsub("\x92", "'", PlanName)) 
+# 
+# write.csv(ppd, "ppd.csv")
+
+ppd <- read.csv("ppd.csv")
+
+ppd <- ppd %>% 
   #Select state plans only and get data after 2000. Filter out three plans that don't have enough data.
   filter(AdministeringGovt == 0, fy > 2001, !(PlanName %in% c("Colorado State and School", 
                                                               "Oklahoma Municipal Employees",
