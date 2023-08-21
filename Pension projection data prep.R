@@ -13,7 +13,7 @@ index_returns <- read.csv(paste(FolderName, "/", index_returns_output, sep = "")
 #Filter and clean PPD data
 # ppd <- ppd_full %>%
 #   mutate(PlanFullName = gsub("\x92", "'", PlanFullName),    #clean plan names and full names
-#          PlanName = gsub("\x92", "'", PlanName)) 
+#          PlanName = gsub("\x92", "'", PlanName))
 # 
 # write.csv(ppd, "ppd.csv")
 
