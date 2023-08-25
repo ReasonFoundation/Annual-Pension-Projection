@@ -2,7 +2,8 @@
 ###############################################################
 #Import pension data
 ppd_full <- read.csv(paste(FolderName, "/", PPDLatest, sep = ""))
-latest_returns_data <- read.csv(paste(FolderName, "/", ReturnsDataFile, sep = ""))
+# latest_returns_data <- read.csv(paste(FolderName, "/", ReturnsDataFile, sep = ""))
+latest_returns_data <- read.csv("https://raw.githubusercontent.com/ReasonFoundation/Annual-Pension-Projection/main/Data/Latest%20Returns.csv")
 
 #Import index returns data
 index_returns <- read.csv(paste(FolderName, "/", index_returns_output, sep = ""))
