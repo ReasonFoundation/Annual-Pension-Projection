@@ -112,7 +112,7 @@ aal_f <- function(aal, tpl, arr, payroll, nc, ben_pay) {
         #then use the total pension liability figure
         aal[i] <- tpl[i]
       } else {
-        #if tpl isn't avaolable, estimate the aal by the roll forward method
+        #if tpl isn't available, estimate the aal by the roll forward method
         aal[i] <- aal[i-1]*(1 + arr[i]) + (nc[i]*payroll[i] + ben_pay[i])*(1 + arr[i])^0.5  
       }
     }
