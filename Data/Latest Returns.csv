@@ -1,5 +1,5 @@
 plan_name,fy,latest_return
-Alabama ERS,2023,
+Alabama ERS,2023,0.1
 Alaska PERS,2023,
 Arizona SRS,2023,
 Arkansas PERS,2023,
@@ -17,8 +17,8 @@ Indiana PERF,2023,
 Indiana Teachers,2023,
 Iowa PERS,2023,
 Kansas PERS,2023,
-Kentucky County,2023,0.102
-Kentucky ERS,2023,0.095
+Kentucky County,2023,0.1025
+Kentucky ERS,2023,0.0825
 Kentucky Teachers,2023,
 LA County ERS,2023,
 Louisiana SERS,2023,

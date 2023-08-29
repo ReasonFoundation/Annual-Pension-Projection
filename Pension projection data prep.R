@@ -2,7 +2,15 @@
 ###############################################################
 #Import pension data
 ppd_full <- read.csv(paste(FolderName, "/", PPDLatest, sep = ""))
-latest_returns_data <- read.csv(paste(FolderName, "/", ReturnsDataFile, sep = ""))
+# latest_returns_data <- read.csv(paste(FolderName, "/", ReturnsDataFile, sep = ""))
+
+fetchData <- function() {
+  url <- "https://raw.githubusercontent.com/ReasonFoundation/Annual-Pension-Projection/main/Data/Latest%20Returns.csv"
+  data <- read.csv(url)
+  return(data)
+}
+
+latest_returns_data <- fetchData()
 
 #Import index returns data
 index_returns <- read.csv(paste(FolderName, "/", index_returns_output, sep = ""))
@@ -13,7 +21,7 @@ index_returns <- read.csv(paste(FolderName, "/", index_returns_output, sep = "")
 #Filter and clean PPD data
 # ppd <- ppd_full %>%
 #   mutate(PlanFullName = gsub("\x92", "'", PlanFullName),    #clean plan names and full names
-#          PlanName = gsub("\x92", "'", PlanName)) 
+#          PlanName = gsub("\x92", "'", PlanName))
 # 
 # write.csv(ppd, "ppd.csv")
 
