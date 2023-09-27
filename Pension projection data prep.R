@@ -53,11 +53,20 @@ ppd <- ppd %>%
   mutate(fye = ymd(fye),
          month = month(fye), .after = fye)
 
-#Impute missing normal costs for New York State Teachers, NY State & Local ERS, and NY State & Local Police & Fire
+#Impute missing normal costs and mva data
 ppd <- ppd %>% 
   mutate(nc = replace(nc, plan_name == "New York State Teachers" & fy == 2020, 0.1),
          nc = replace(nc, plan_name == "NY State & Local ERS" & fy == 2020, 0.17),
-         nc = replace(nc, plan_name == "NY State & Local Police & Fire" & fy == 2020, 0.3))
+         nc = replace(nc, plan_name == "NY State & Local Police & Fire" & fy == 2020, 0.3),
+         mva = replace(mva, plan_name == "Wisconsin RS" & fy == 2022, 118366400),
+         mva = replace(mva, plan_name == "Hawaii ERS" & fy == 2022, 21854814),
+         mva = replace(mva, plan_name == "Arkansas Teachers" & fy == 2022, 19679467))
+
+#Fix NC Teachers data
+ppd <- ppd %>% 
+  group_by(plan_name) %>% 
+  mutate(across(c(aal, arr:ben_pay), ~ ifelse(plan_name == "North Carolina Teachers and State Employees", lead(.x), .x))) %>% 
+  ungroup()
 
 #Fix wrong data:
 ppd <- ppd %>% 
