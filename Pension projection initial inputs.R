@@ -1,6 +1,6 @@
 #Folder and file names
 FolderName <- "Data"
-PPDLatest <- "ppd-data-latest.csv"
+PPDLatest <- "ppd-data-latest (1).csv"
 acwi_exUS_file <- "acwi_exUS_price_net.xls"
 acwi_exUS_name <- "ACWI ex USA Standard (Large+Mid Cap)"
 index_returns_output <- "index_returns.csv"

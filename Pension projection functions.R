@@ -132,18 +132,22 @@ mva_f <- function(mva, return, payroll, cont_rate, ben_pay) {
 
 
 #Final projection function 
+# input_return <- 0.07
+# inf_adj <- F
 projection_f <- function(input_return, inf_adj = F) {
   
   #plan projection
   ppd_project_plan <- ppd_benchmark %>% 
     left_join(cpi) %>% 
     group_by(plan_name) %>% 
-    mutate(return = return_f(return, fy, latest_return, predict_return, input_return),
-           inf_adj = inf_adj,
-           aal = aal_f(aal, tpl, arr, payroll, nc, ben_pay),
-           aal = ifelse(inf_adj == T, aal * cpi[fy == latest_update_year] / cpi, aal),
-           mva = mva_f(mva, return, payroll, cont_rate, ben_pay),
-           mva = ifelse(inf_adj == T, mva * cpi[fy == latest_update_year] / cpi, mva)) %>% 
+    mutate(
+      return = return_f(return, fy, latest_return, predict_return, input_return),
+      inf_adj = inf_adj,
+      aal = aal_f(aal, tpl, arr, payroll, nc, ben_pay),
+      aal = ifelse(inf_adj == T, aal * cpi[fy == latest_update_year] / cpi, aal),
+      mva = mva_f(mva, return, payroll, cont_rate, ben_pay),
+      mva = ifelse(inf_adj == T, mva * cpi[fy == latest_update_year] / cpi, mva)
+      ) %>% 
     mutate(ual = aal - mva, 
            funded_ratio = mva/aal,
            .after = mva) %>% 

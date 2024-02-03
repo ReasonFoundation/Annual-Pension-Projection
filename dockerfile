@@ -13,6 +13,7 @@ RUN R -e "install.packages('readxl', repos='http://cran.rstudio.com/', version='
 RUN R -e "install.packages('dplyr', repos='http://cran.rstudio.com/', version='1.1.1')"
 RUN R -e "install.packages('tidyr', repos='http://cran.rstudio.com/', version='1.3.0')"
 RUN R -e "install.packages('purrr', repos='http://cran.rstudio.com/')"
+RUN R -e "install.packages('stringr', repos='http://cran.rstudio.com/')"
 RUN R -e "install.packages('formattable', repos='http://cran.rstudio.com/')"
 RUN R -e "install.packages('scales', repos='http://cran.rstudio.com/')"
 RUN R -e "install.packages('plotly', repos='http://cran.rstudio.com/')"

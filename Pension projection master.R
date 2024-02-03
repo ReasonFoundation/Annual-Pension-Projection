@@ -2,6 +2,7 @@ rm(list = ls())
 # library(tidyverse)
 library(purrr)
 library(dplyr)
+# library(stringr)
 library(tidyr)
 library(readxl)
 library(plotly)
@@ -33,4 +34,5 @@ source("Pension projection data prep.R")
 
 #Examples:
 # output <- projection_f(input_return = 0.05)
-output_inf <- projection_f(input_return = 0.05, inf_adj = T)
+# output_inf <- projection_f(input_return = 0.07)
+
