@@ -140,6 +140,7 @@ projection_f <- function(input_return, inf_adj = F) {
   ppd_project_plan <- ppd_benchmark %>% 
     left_join(cpi) %>% 
     group_by(plan_name) %>% 
+    # mutate(return = return_f(return, fy, latest_return, predict_return, input_return))
     mutate(
       return = return_f(return, fy, latest_return, predict_return, input_return),
       inf_adj = inf_adj,

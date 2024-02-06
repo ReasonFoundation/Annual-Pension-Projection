@@ -3,6 +3,9 @@
 #Import pension data
 ppd_full <- read.csv(paste(FolderName, "/", PPDLatest, sep = ""))
 latest_returns_data <- read.csv(paste(FolderName, "/", ReturnsDataFile, sep = ""))
+previous_ppd_full <- read.csv(paste(FolderName, "/", PPD_previous, sep = ""))
+
+
 
 # fetchData <- function() {
 #   url <- "https://raw.githubusercontent.com/ReasonFoundation/Annual-Pension-Projection/main/Data/Latest%20Returns.csv"
@@ -24,6 +27,15 @@ index_returns <- read.csv(paste(FolderName, "/", index_returns_output, sep = "")
 #     PlanFullName = gsub("\x92", "'", PlanFullName),    #clean plan names and full names
 #     PlanName = gsub("\x92", "'", PlanName)
 #     )
+# 
+# ppd <- ppd %>% 
+#   mutate(
+#     NormCostRate_tot = replace(NormCostRate_tot, str_detect(PlanName, 'Washington'),  
+#                  previous_ppd_full[str_detect(previous_ppd_full$PlanName, "Washington"),]$NormCostRate_tot),
+#     NormCostRate_tot = replace(NormCostRate_tot, str_detect(PlanName, 'South Dakota'),  
+#                  previous_ppd_full[str_detect(previous_ppd_full$PlanName, "South Dakota"),]$NormCostRate_tot),
+#   )
+# 
 # 
 # write.csv(ppd, "ppd.csv")
 
@@ -54,6 +66,8 @@ ppd <- ppd %>%
          ben_pay = expense_TotBenefits) %>% 
   mutate(fye = ymd(fye),
          month = month(fye), .after = fye)
+
+
 
 #Impute missing normal costs and mva data
 ppd <- ppd %>% 
